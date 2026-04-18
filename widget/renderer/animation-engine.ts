@@ -29,6 +29,18 @@ const IDLE_ANIMATIONS = [
   "IdleSideToSide",
   "IdleSnooze",
   "Idle1_1",
+  "LookRight",
+  "LookLeft",
+  "LookUp",
+  "LookDown",
+  "LookUpRight",
+  "LookUpLeft",
+  "LookDownRight",
+  "LookDownLeft",
+  "Wave",
+  "GetArtsy",
+  "Hearing_1",
+  "CheckingSomething",
 ];
 
 export class AnimationEngine {

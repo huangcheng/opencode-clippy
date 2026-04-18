@@ -19,9 +19,9 @@ const BASE_MAPPINGS: Record<string, EventMapping> = {
     tip: "Hey! Let's write some code!",
   },
   "session.idle": {
-    animation: "IdleSnooze",
-    priority: "normal",
-    tip: null,
+    animation: "Congratulate",
+    priority: "high",
+    tip: "All done! Ready for more.",
   },
   "session.deleted": {
     animation: "GoodBye",

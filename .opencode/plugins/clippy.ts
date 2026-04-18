@@ -84,6 +84,7 @@ const ClippyPlugin: Plugin = async ({ client }) => {
   let socket: net.Socket | null = null;
   let heartbeat: ReturnType<typeof setInterval> | null = null;
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  let currentSessionID: string | null = null;
   const tips = new TipsEngine();
   tips.onSessionCreated();
 
@@ -92,28 +93,41 @@ const ClippyPlugin: Plugin = async ({ client }) => {
   }
 
   function send(msg: object): void {
-    if (socket && !socket.destroyed) {
-      socket.write(JSON.stringify(msg) + "\n");
+    if (socket && !socket.destroyed && socket.writable) {
+      try {
+        socket.write(JSON.stringify(msg) + "\n");
+      } catch {
+        cleanup();
+        reconnect();
+      }
     } else {
       reconnect();
     }
   }
 
+  function cleanup(): void {
+    if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
+    if (socket) { try { socket.destroy(); } catch {} socket = null; }
+  }
+
   function connect(): void {
+    cleanup();
     try {
       socket = net.createConnection(IPC_PATH, () => {
         log("info", `Connected to Clippy at ${IPC_PATH}`);
-        heartbeat = setInterval(() => send({ type: "ping" }), HEARTBEAT_MS);
+        heartbeat = setInterval(() => {
+          try { send({ type: "ping" }); } catch { cleanup(); reconnect(); }
+        }, HEARTBEAT_MS);
       });
 
       socket.on("close", () => {
-        if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
-        socket = null;
+        cleanup();
         reconnect();
       });
 
       socket.on("error", (err) => {
         log("warn", `IPC error: ${err.message}`);
+        cleanup();
       });
     } catch (e: unknown) {
       log("warn", `Connect exception: ${e}`);
@@ -139,6 +153,20 @@ const ClippyPlugin: Plugin = async ({ client }) => {
     event: async ({ event }: { event: { type: string; properties?: Record<string, unknown> } }) => {
       const t = event.type;
       const p = (event.properties || {}) as Record<string, unknown>;
+
+      // Track session ID (from notificator pattern)
+      const eventSessionID = (p.sessionID as string)
+        || (p.info as Record<string, unknown>)?.id as string
+        || null;
+
+      if (t === "session.created" && eventSessionID) {
+        currentSessionID = eventSessionID;
+      }
+
+      // Only forward session.idle for the current session
+      if (t === "session.idle" && eventSessionID && eventSessionID !== currentSessionID) {
+        return;
+      }
 
       switch (t) {
         case "session.created":
@@ -168,6 +196,9 @@ const ClippyPlugin: Plugin = async ({ client }) => {
           forward(t);
           break;
       }
+    },
+    "permission.ask": async (input: { type: string }, _output: unknown) => {
+      forward("permission.asked", { tool: input.type });
     },
   };
 };

@@ -68,14 +68,12 @@ export class SpeechBubble {
 
     // Classic Windows 98 Clippy tooltip styling
     Object.assign(bubble.style, {
-      position: "absolute",
-      bottom: "100px", // above Clippy sprite
-      left: "8px",
+      position: "relative",
       maxWidth: isTip ? "300px" : "250px",
       backgroundColor: "#FFFFE1",
       border: "1px solid #000000",
-      borderRadius: "0", // sharp corners!
-      boxShadow: "2px 2px 0px #808080", // Windows 98 drop shadow
+      borderRadius: "0",
+      boxShadow: "2px 2px 0px #808080",
       padding: "8px",
       fontFamily: '"Tahoma", "MS Sans Serif", "Microsoft Sans Serif", sans-serif',
       fontSize: "11px",
@@ -84,6 +82,7 @@ export class SpeechBubble {
       cursor: "pointer",
       zIndex: "100",
       userSelect: "none",
+      whiteSpace: "normal",
     });
 
     if (isTip) {
@@ -129,12 +128,12 @@ export class SpeechBubble {
       bubble.addEventListener("click", () => this.dismiss(true));
     }
 
-    // Triangular tail pointing down-left toward Clippy
+    // Triangular tail pointing down-right toward Clippy
     const tail = document.createElement("div");
     Object.assign(tail.style, {
       position: "absolute",
       bottom: "-10px",
-      left: "16px",
+      right: "12px",
       width: "0",
       height: "0",
       borderLeft: "10px solid transparent",
@@ -146,7 +145,7 @@ export class SpeechBubble {
     Object.assign(tailInner.style, {
       position: "absolute",
       bottom: "-9px",
-      left: "17px",
+      right: "13px",
       width: "0",
       height: "0",
       borderLeft: "9px solid transparent",

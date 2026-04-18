@@ -103,10 +103,19 @@ function startIPCServer(): void {
   ipcServer = net.createServer((socket) => {
     console.log("Plugin connected via IPC");
     let buffer = "";
+    let lastPing = Date.now();
+
+    // Heartbeat check — close stale connections
+    const heartbeatCheck = setInterval(() => {
+      if (Date.now() - lastPing > 15000) {
+        console.log("Plugin heartbeat timeout, closing connection");
+        clearInterval(heartbeatCheck);
+        socket.destroy();
+      }
+    }, 5000);
 
     socket.on("data", (data) => {
       buffer += data.toString();
-      // Split by newline — each message is a JSON line
       const lines = buffer.split("\n");
       buffer = lines.pop() || "";
 
@@ -114,7 +123,10 @@ function startIPCServer(): void {
         if (!line.trim()) continue;
         try {
           const msg = JSON.parse(line);
-          if (msg.type === "ping") continue;
+          if (msg.type === "ping") {
+            lastPing = Date.now();
+            continue;
+          }
 
           console.log("Forwarding to renderer:", msg.type, msg.event || "");
           if (mainWindow && !mainWindow.isDestroyed()) {
@@ -126,8 +138,14 @@ function startIPCServer(): void {
       }
     });
 
-    socket.on("close", () => console.log("Plugin disconnected"));
-    socket.on("error", (err) => console.log("Socket error:", err.message));
+    socket.on("close", () => {
+      clearInterval(heartbeatCheck);
+      console.log("Plugin disconnected");
+    });
+    socket.on("error", (err) => {
+      clearInterval(heartbeatCheck);
+      console.log("Socket error:", err.message);
+    });
   });
 
   ipcServer.listen(IPC_PATH, () => {
