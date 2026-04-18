@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenCode Clippy</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 350px;
+      height: 300px;
+      overflow: hidden;
+      background: transparent;
+      -webkit-app-region: drag;
+    }
+    #clippy-container {
+      position: relative;
+      width: 350px;
+      height: 300px;
+    }
+    #speech-bubble-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 180px;
+      pointer-events: auto;
+      -webkit-app-region: no-drag;
+    }
+    #sprite-area {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 124px;
+      height: 93px;
+    }
+    #sprite-canvas {
+      width: 124px;
+      height: 93px;
+      image-rendering: pixelated;
+    }
+    #lottie-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="clippy-container">
+    <div id="speech-bubble-container"></div>
+    <div id="lottie-overlay"></div>
+    <div id="sprite-area">
+      <canvas id="sprite-canvas"></canvas>
+    </div>
+  </div>
+  <script type="module" src="./renderer.ts"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clippy Animation Test Harness</title>
+  <style>
+    body { font-family: Tahoma, sans-serif; background: #f0f0f0; padding: 20px; }
+    #controls { margin-bottom: 20px; }
+    select, button { font-size: 14px; padding: 4px 8px; }
+    #canvas-container { display: inline-block; border: 1px solid #999; background: white; }
+    canvas { image-rendering: pixelated; }
+    #animation-list { margin-top: 20px; }
+    .anim-btn { margin: 2px; padding: 4px 8px; font-size: 11px; cursor: pointer; }
+    #speech-test { position: relative; display: inline-block; margin-left: 20px; vertical-align: top; }
+  </style>
+</head>
+<body>
+  <h3>Clippy Animation Test Harness</h3>
+  <div id="controls">
+    <button onclick="playAll()">Play All Sequentially</button>
+    <button onclick="playRandom()">Random Idle</button>
+    <span id="current-anim" style="margin-left: 10px; color: #666;"></span>
+  </div>
+  <div style="display: flex; gap: 20px;">
+    <div>
+      <div id="canvas-container">
+        <canvas id="sprite-canvas"></canvas>
+      </div>
+      <div id="speech-test"></div>
+    </div>
+    <div id="animation-list"></div>
+  </div>
+
+  <script type="module">
+    import { AnimationEngine } from './animation-engine.ts';
+    import { SpeechBubble } from './speech-bubble.ts';
+    import animationData from '../../assets/animations.json';
+
+    const canvas = document.getElementById('sprite-canvas');
+    const engine = new AnimationEngine(canvas);
+    const bubbleContainer = document.getElementById('speech-test');
+    const speechBubble = new SpeechBubble(bubbleContainer);
+    const statusEl = document.getElementById('current-anim');
+    const listEl = document.getElementById('animation-list');
+
+    engine.onAnimationStart = (name) => { statusEl.textContent = `Playing: ${name}`; };
+    engine.onAnimationEnd = () => { statusEl.textContent = 'Idle'; };
+
+    const spriteUrl = new URL('../../assets/map.png', import.meta.url).href;
+    await engine.load(spriteUrl, animationData);
+
+    const names = engine.getAnimationNames();
+    names.forEach(name => {
+      const btn = document.createElement('button');
+      btn.className = 'anim-btn';
+      btn.textContent = name;
+      btn.onclick = () => {
+        engine.play(name, 'high');
+        speechBubble.show({ type: 'status', text: `Playing: ${name}` });
+      };
+      listEl.appendChild(btn);
+    });
+
+    // Test proactive tip
+    const tipBtn = document.createElement('button');
+    tipBtn.className = 'anim-btn';
+    tipBtn.style.background = '#FFFFE1';
+    tipBtn.textContent = '🗨️ Test Proactive Tip';
+    tipBtn.onclick = () => {
+      speechBubble.show({
+        type: 'tip',
+        title: "It looks like you're running into errors!",
+        body: 'Would you like me to suggest checking the error logs?',
+      });
+      engine.play('GetAttention', 'high');
+    };
+    listEl.insertBefore(tipBtn, listEl.firstChild);
+
+    window.playAll = async () => {
+      for (const name of names) {
+        await engine.play(name, 'high');
+        await new Promise(r => setTimeout(r, 300));
+      }
+    };
+
+    window.playRandom = () => {
+      const idle = names.filter(n => n.startsWith('Idle'));
+      const pick = idle[Math.floor(Math.random() * idle.length)];
+      engine.play(pick, 'normal');
+    };
+  </script>
+</body>
+</html>
