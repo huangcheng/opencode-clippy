@@ -26,7 +26,7 @@ jobs:
           npm version "$VERSION" --no-git-tag-version --allow-same-version
 
       - name: Publish
-        run: npm publish --access public
+        run: npm publish --access public || echo "::warning::npm publish failed (version may already exist)"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
