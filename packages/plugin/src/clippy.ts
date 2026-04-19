@@ -59,6 +59,7 @@ const ClippyPlugin: Plugin = async ({ client }) => {
       socket.on("error", (err) => {
         log("warn", `IPC error: ${err.message}`);
         cleanup();
+        reconnect();
       });
     } catch (e: unknown) {
       log("warn", `Connect exception: ${e}`);
