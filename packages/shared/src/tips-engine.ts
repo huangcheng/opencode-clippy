@@ -74,8 +74,8 @@ export class TipsEngine {
     ) {
       this.cooldowns.set("idle-after-start", Date.now());
       return {
-        title: "It looks like you're thinking about where to start!",
-        body: "Try describing your task to OpenCode.",
+        title: "tips.idle.title",
+        body: "tips.idle.body",
         animation: "GetAttention",
       };
     }
@@ -109,8 +109,8 @@ export class TipsEngine {
     );
     if (recentErrors.length >= 3) {
       return {
-        title: "It looks like you're running into errors!",
-        body: "Would you like me to suggest checking the error logs?",
+        title: "tips.repeated_errors.title",
+        body: "tips.repeated_errors.body",
         animation: "GetAttention",
       };
     }
@@ -127,8 +127,8 @@ export class TipsEngine {
       /\.(test|spec)\.|__tests__\//.test(last.filePath)
     ) {
       return {
-        title: "It looks like you're working on tests!",
-        body: "Remember to run them after making changes.",
+        title: "tips.test_file.title",
+        body: "tips.test_file.body",
         animation: "GetAttention",
       };
     }
@@ -149,8 +149,8 @@ export class TipsEngine {
       fileCounts.set(e.filePath!, count);
       if (count >= 3) {
         return {
-          title: "It looks like you're making lots of changes!",
-          body: "Don't forget to save your progress.",
+          title: "tips.rapid_edits.title",
+          body: "tips.rapid_edits.body",
           animation: "GetAttention",
         };
       }
@@ -168,8 +168,8 @@ export class TipsEngine {
       /\bgit\s+(commit|push|checkout|merge|rebase|reset)\b/.test(last.filePath)
     ) {
       return {
-        title: "It looks like you're working with git!",
-        body: "Make sure to commit before switching branches.",
+        title: "tips.git.title",
+        body: "tips.git.body",
         animation: "GetAttention",
       };
     }
@@ -192,8 +192,8 @@ export class TipsEngine {
     );
     if (denials.length >= 2) {
       return {
-        title: "It looks like you're being cautious with permissions!",
-        body: "You can configure auto-approve for safe operations.",
+        title: "tips.permission.title",
+        body: "tips.permission.body",
         animation: "GetAttention",
       };
     }
@@ -207,8 +207,8 @@ export class TipsEngine {
     if (last?.type === "tool.execute.before" && last.tool === "edit") {
       this.firstEditSent = true;
       return {
-        title: "It looks like you're about to make your first change!",
-        body: "I'll keep an eye on things.",
+        title: "tips.first_edit.title",
+        body: "tips.first_edit.body",
         animation: "GetAttention",
       };
     }
@@ -224,8 +224,8 @@ export class TipsEngine {
       /\.(env|json|ya?ml|toml|config\.)/.test(last.filePath)
     ) {
       return {
-        title: "It looks like you're editing configuration!",
-        body: "Double-check for typos — config errors can be sneaky.",
+        title: "tips.config.title",
+        body: "tips.config.body",
         animation: "GetAttention",
       };
     }

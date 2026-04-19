@@ -16,17 +16,17 @@ const BASE_MAPPINGS: Record<string, EventMapping> = {
   "session.created": {
     animation: "Greeting",
     priority: "high",
-    tip: "Hey! Let's write some code!",
+    tip: "tip.session.created",
   },
   "session.idle": {
     animation: "Congratulate",
     priority: "high",
-    tip: "All done! Ready for more.",
+    tip: "tip.session.idle",
   },
   "session.deleted": {
     animation: "GoodBye",
     priority: "high",
-    tip: "See you next time!",
+    tip: "tip.session.deleted",
   },
   "session.updated": {
     animation: "RestPose",
@@ -41,27 +41,27 @@ const BASE_MAPPINGS: Record<string, EventMapping> = {
   "session.diff": {
     animation: "Writing",
     priority: "high",
-    tip: "Changes detected!",
+    tip: "tip.session.diff",
   },
   "message.updated": {
     animation: "Thinking",
     priority: "high",
-    tip: "Working on it...",
+    tip: "tip.message.updated",
   },
   "message.part.updated": {
     animation: "Thinking",
     priority: "high",
-    tip: "Thinking...",
+    tip: "tip.message.part.updated",
   },
   "permission.asked": {
     animation: "GetAttention",
     priority: "high",
-    tip: "I need your permission!",
+    tip: "tip.permission.asked",
   },
   "file.edited": {
     animation: "Save",
     priority: "normal",
-    tip: "File saved!",
+    tip: "tip.file.edited",
   },
 };
 
@@ -69,17 +69,17 @@ const TOOL_BEFORE_MAPPINGS: Record<string, EventMapping> = {
   read: {
     animation: "Searching",
     priority: "normal",
-    tip: "Reading files...",
+    tip: "tip.tool.read",
   },
   edit: {
     animation: "Writing",
     priority: "normal",
-    tip: "Making changes...",
+    tip: "tip.tool.edit",
   },
   bash: {
     animation: "GetTechy",
     priority: "normal",
-    tip: "Running command...",
+    tip: "tip.tool.bash",
   },
 };
 
@@ -87,12 +87,12 @@ const PERMISSION_REPLIED_MAPPINGS: Record<string, EventMapping> = {
   granted: {
     animation: "Congratulate",
     priority: "normal",
-    tip: "Thanks!",
+    tip: "tip.permission.granted",
   },
   denied: {
     animation: "LookDown",
     priority: "normal",
-    tip: "Okay, I won't do that.",
+    tip: "tip.permission.denied",
   },
 };
 
@@ -110,7 +110,7 @@ export function getEventMapping(
     return TOOL_BEFORE_MAPPINGS[detail.tool] ?? {
       animation: "Thinking",
       priority: "normal",
-      tip: "Working on it...",
+      tip: "tip.tool.default",
     };
   }
 
@@ -119,13 +119,13 @@ export function getEventMapping(
       return {
         animation: "Alert",
         priority: "high",
-        tip: "Oops, something went wrong!",
+        tip: "tip.tool.error",
       };
     }
     return {
       animation: "Congratulate",
       priority: "normal",
-      tip: "Done!",
+      tip: "tip.tool.success",
     };
   }
 

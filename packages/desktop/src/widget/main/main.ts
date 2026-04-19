@@ -30,6 +30,7 @@ const CONFIG_PATH = path.join(CONFIG_DIR, "config.json");
 interface ClippyConfig {
   window?: { x: number; y: number };
   autoStart?: boolean;
+  language?: string;
 }
 
 function loadConfig(): ClippyConfig {
@@ -80,26 +81,32 @@ function createTray(): void {
   rebuildTrayMenu();
 }
 
+// Tray menu i18n labels
+const TRAY_LABELS: Record<string, Record<string, string>> = {
+  en: { settings: "Settings", about: "About", exit: "Exit" },
+  "zh-CN": { settings: "设置", about: "关于", exit: "退出" },
+};
+
+function trayLabel(key: string): string {
+  const config = loadConfig();
+  const lang = config.language ?? "en";
+  return TRAY_LABELS[lang]?.[key] ?? TRAY_LABELS.en[key] ?? key;
+}
+
 function rebuildTrayMenu(): void {
   if (!tray) return;
-  const config = loadConfig();
-  const autoStartEnabled = config.autoStart ?? false;
 
   tray.setContextMenu(Menu.buildFromTemplate([
     {
-      label: "Launch at Login",
-      type: "checkbox",
-      checked: autoStartEnabled,
-      click: (menuItem) => {
-        const enabled = menuItem.checked;
-        app.setLoginItemSettings({ openAtLogin: enabled });
-        saveConfig({ ...loadConfig(), autoStart: enabled });
-        rebuildTrayMenu();
+      label: trayLabel("settings"),
+      click: () => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send("open-settings");
+        }
       },
     },
-    { type: "separator" },
     {
-      label: "About",
+      label: trayLabel("about"),
       click: () => {
         const { dialog } = require("electron");
         dialog.showMessageBox({
@@ -111,7 +118,7 @@ function rebuildTrayMenu(): void {
       },
     },
     { type: "separator" },
-    { label: "Exit", click: () => app.quit() },
+    { label: trayLabel("exit"), click: () => app.quit() },
   ]));
 }
 
@@ -219,6 +226,22 @@ function startIPCServer(): void {
 
 app.on("second-instance", () => {
   if (mainWindow && !mainWindow.isVisible()) mainWindow.show();
+});
+
+// --- Settings IPC handlers ---
+ipcMain.handle("get-config", () => {
+  return loadConfig();
+});
+
+ipcMain.handle("set-config", (_e, partial: Record<string, unknown>) => {
+  const config = { ...loadConfig(), ...partial };
+  saveConfig(config);
+  if ("autoStart" in partial) {
+    app.setLoginItemSettings({ openAtLogin: !!partial.autoStart });
+  }
+  if ("language" in partial) {
+    rebuildTrayMenu();
+  }
 });
 
 // --- Drag IPC handlers ---

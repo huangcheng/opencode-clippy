@@ -6,6 +6,8 @@ import {
 } from "./event-mapping";
 import { SpeechBubble, type BubbleContent } from "./speech-bubble";
 import { LottieEffects } from "./lottie-effects";
+import { t, setLocale, onLocaleChange } from "./i18n";
+import { SettingsModal } from "./settings-modal";
 import animationData from "../../../assets/animations.json";
 
 declare global {
@@ -15,6 +17,9 @@ declare global {
       startDrag?: () => void;
       moveDrag?: (x: number, y: number) => void;
       stopDrag?: () => void;
+      getConfig?: () => Promise<Record<string, unknown>>;
+      setConfig?: (partial: Record<string, unknown>) => Promise<void>;
+      onSettingsOpen?: (callback: () => void) => void;
     };
   }
 }
@@ -70,26 +75,26 @@ async function init(): Promise<void> {
 
   // Play greeting on startup so Clippy is visible immediately
   engine.play("Greeting", "high");
-  speechBubble.show({ type: "status", text: "Hey! Let's write some code!" });
+  speechBubble.show({ type: "status", text: t("greeting") });
   console.log("Clippy renderer init complete, listening for events...");
 
   // --- Click & double-click interactions ---
   const CLICK_REACTIONS = [
-    { animation: "Wave", tip: "Hi there! Need anything?" },
-    { animation: "Greeting", tip: "Hello again!" },
-    { animation: "GetAttention", tip: "You rang?" },
-    { animation: "Hearing_1", tip: "I'm listening!" },
-    { animation: "LookUp", tip: "What's up?" },
-    { animation: "CheckingSomething", tip: "Let me check..." },
-    { animation: "IdleEyeBrowRaise", tip: "Hmm?" },
+    { animation: "Wave", tipKey: "click.wave" },
+    { animation: "Greeting", tipKey: "click.greeting" },
+    { animation: "GetAttention", tipKey: "click.attention" },
+    { animation: "Hearing_1", tipKey: "click.hearing" },
+    { animation: "LookUp", tipKey: "click.lookup" },
+    { animation: "CheckingSomething", tipKey: "click.checking" },
+    { animation: "IdleEyeBrowRaise", tipKey: "click.eyebrow" },
   ];
 
   const DBLCLICK_REACTIONS = [
-    { animation: "GetWizardy", tip: "Abracadabra!" },
-    { animation: "GetArtsy", tip: "Feeling creative!" },
-    { animation: "EmptyTrash", tip: "Taking out the trash!" },
-    { animation: "Congratulate", tip: "You're doing great!" },
-    { animation: "Show", tip: "Ta-da!" },
+    { animation: "GetWizardy", tipKey: "dblclick.wizardy" },
+    { animation: "GetArtsy", tipKey: "dblclick.artsy" },
+    { animation: "EmptyTrash", tipKey: "dblclick.trash" },
+    { animation: "Congratulate", tipKey: "dblclick.congratulate" },
+    { animation: "Show", tipKey: "dblclick.show" },
   ];
 
   let clickCooldown = false;
@@ -111,7 +116,7 @@ async function init(): Promise<void> {
 
     const reaction = DBLCLICK_REACTIONS[Math.floor(Math.random() * DBLCLICK_REACTIONS.length)];
     engine.play(reaction.animation, "high");
-    speechBubble.show({ type: "status", text: reaction.tip });
+    speechBubble.show({ type: "status", text: t(reaction.tipKey) });
   });
 
   canvas.addEventListener("click", (e) => {
@@ -129,7 +134,7 @@ async function init(): Promise<void> {
 
       const reaction = CLICK_REACTIONS[Math.floor(Math.random() * CLICK_REACTIONS.length)];
       engine.play(reaction.animation, "high");
-      speechBubble.show({ type: "status", text: reaction.tip });
+      speechBubble.show({ type: "status", text: t(reaction.tipKey) });
     }, DBLCLICK_DELAY_MS);
   });
 
@@ -226,12 +231,32 @@ async function init(): Promise<void> {
         if (mapping.tip) {
           const content: BubbleContent = {
             type: "status",
-            text: mapping.tip,
+            text: t(mapping.tip),
           };
           speechBubble.show(content);
         }
       });
     }
+  });
+
+  // --- Settings modal ---
+  const clippyContainer = document.getElementById("clippy-container") as HTMLElement;
+  const settingsModal = new SettingsModal(
+    clippyContainer,
+    () => window.clippy.getConfig?.() ?? Promise.resolve({}),
+    (partial) => window.clippy.setConfig?.(partial) ?? Promise.resolve(),
+  );
+
+  // Load saved language on startup
+  window.clippy.getConfig?.().then((config: Record<string, unknown>) => {
+    if (config.language && typeof config.language === "string") {
+      setLocale(config.language);
+    }
+  });
+
+  // Open settings from tray menu
+  window.clippy.onSettingsOpen?.(() => {
+    settingsModal.open();
   });
 }
 
