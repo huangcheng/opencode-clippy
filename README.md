@@ -40,45 +40,45 @@ OpenCode ──► Plugin (clippy.ts) ──────────────
 
 ## Installation
 
-### 1. Clone and build
+### Plugin (OpenCode integration)
+
+Add to your `~/.config/opencode/opencode.json`:
+
+```json
+{
+  "plugin": [
+    "opencode-clippy"
+  ]
+}
+```
+
+That's it — the plugin is installed from npm. Restart OpenCode to activate.
+
+### Desktop Widget
+
+Download the latest release for your platform from [GitHub Releases](https://github.com/huangcheng/opencode-clippy/releases):
+
+| Platform | Architecture | Download |
+|---|---|---|
+| macOS | Apple Silicon (arm64) | `.dmg` |
+| Windows | x86-64 | `.exe` |
+| Linux | arm64 | `.AppImage` / `.deb` |
+
+Or build from source:
 
 ```bash
 git clone https://github.com/huangcheng/opencode-clippy.git
 cd opencode-clippy
 npm install
 npm run build
-```
-
-### 2. Register the plugin globally
-
-Add the plugin to your OpenCode config so it loads from any project directory:
-
-```bash
-# macOS / Linux
-vim ~/.config/opencode/opencode.json
-```
-
-Add to the `"plugin"` array:
-
-```json
-{
-  "plugin": [
-    "file:///path/to/opencode-clippy/.opencode/plugins/clippy.ts"
-  ]
-}
-```
-
-### 3. Start Clippy
-
-```bash
-# Terminal 1 — start the widget
 npm start
-
-# Terminal 2 — start OpenCode (in any project directory)
-opencode
 ```
 
-Clippy appears in the bottom-right corner and reacts to everything you do in OpenCode.
+### Usage
+
+1. Start the Clippy desktop widget (from the downloaded app or `npm start`)
+2. Start OpenCode in any project directory
+3. Clippy reacts to your coding — they auto-connect in any launch order
 
 ## Development
 

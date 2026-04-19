@@ -1,8 +1,25 @@
 {
   "name": "opencode-clippy",
   "version": "0.1.0",
-  "description": "A Microsoft Office Clippy desktop widget that hooks into OpenCode events",
-  "main": "dist/widget/main/main.js",
+  "description": "A Microsoft Office Clippy desktop widget that hooks into OpenCode events — animations, proactive tips, and Lottie effects",
+  "main": ".opencode/plugins/clippy.ts",
+  "keywords": [
+    "opencode",
+    "clippy",
+    "plugin",
+    "desktop-widget",
+    "electron",
+    "ai-assistant"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/huangcheng/opencode-clippy.git"
+  },
+  "author": "huangcheng",
+  "license": "MIT",
+  "files": [
+    ".opencode/plugins/clippy.ts"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.main.json && tsc -p tsconfig.preload.json && vite build",
     "build:main": "tsc -p tsconfig.main.json && tsc -p tsconfig.preload.json",
@@ -11,12 +28,10 @@
     "start": "electron dist/widget/main/main.js",
     "clippy": "npm run build && electron dist/widget/main/main.js",
     "package": "electron-builder",
-    "package:mac": "electron-builder --mac",
-    "package:win": "electron-builder --win",
-    "package:linux": "electron-builder --linux"
+    "package:mac": "electron-builder --mac --arm64",
+    "package:win": "electron-builder --win --x64",
+    "package:linux": "electron-builder --linux --arm64"
   },
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
     "@opencode-ai/plugin": "^1.4.0",
@@ -34,25 +49,42 @@
   "build": {
     "appId": "com.opencode.clippy",
     "productName": "OpenCode Clippy",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "publish": null,
+    "directories": {
+      "output": "release"
+    },
     "files": [
       "dist/**/*",
       "assets/**/*"
     ],
     "mac": {
       "target": [
-        "dmg"
+        {
+          "target": "dmg",
+          "arch": ["arm64"]
+        }
       ],
       "category": "public.app-category.developer-tools"
     },
     "win": {
       "target": [
-        "nsis"
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
       ]
     },
     "linux": {
       "target": [
-        "AppImage",
-        "deb"
+        {
+          "target": "AppImage",
+          "arch": ["arm64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["arm64"]
+        }
       ],
       "category": "Development"
     },
