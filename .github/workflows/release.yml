@@ -15,6 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -23,10 +27,16 @@ jobs:
       - name: Set version from tag
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          npm version "$VERSION" --no-git-tag-version --allow-same-version
+          jq --arg v "$VERSION" '.version = $v' packages/plugin/package.json > tmp.json && mv tmp.json packages/plugin/package.json
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build plugin
+        run: pnpm --filter @opencode-clippy/shared build && pnpm --filter opencode-clippy build
 
       - name: Publish
-        run: npm publish --access public || echo "::warning::npm publish failed (version may already exist)"
+        run: pnpm --filter opencode-clippy publish --no-git-checks --access public || echo "::warning::npm publish failed (version may already exist)"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -50,6 +60,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -58,13 +72,13 @@ jobs:
         shell: bash
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          npm version "$VERSION" --no-git-tag-version --allow-same-version
+          jq --arg v "$VERSION" '.version = $v' packages/desktop/package.json > tmp.json && mv tmp.json packages/desktop/package.json
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: pnpm --filter @opencode-clippy/desktop build
 
       - name: Setup QEMU (Linux arm64 cross-compilation)
         if: matrix.os == 'ubuntu-latest'
@@ -73,7 +87,7 @@ jobs:
           platforms: arm64
 
       - name: Package Electron app
-        run: npx electron-builder ${{ matrix.build-args }} --publish never
+        run: pnpm --filter @opencode-clippy/desktop exec electron-builder ${{ matrix.build-args }} --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -82,10 +96,10 @@ jobs:
         with:
           name: electron-${{ matrix.os }}
           path: |
-            release/*.dmg
-            release/*.exe
-            release/*.AppImage
-            release/*.deb
+            packages/desktop/release/*.dmg
+            packages/desktop/release/*.exe
+            packages/desktop/release/*.AppImage
+            packages/desktop/release/*.deb
           if-no-files-found: error
 
   create-release:

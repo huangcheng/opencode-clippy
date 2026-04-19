@@ -6,7 +6,7 @@ import {
 } from "./event-mapping";
 import { SpeechBubble, type BubbleContent } from "./speech-bubble";
 import { LottieEffects } from "./lottie-effects";
-import animationData from "../../assets/animations.json";
+import animationData from "../../../assets/animations.json";
 
 declare global {
   interface Window {
@@ -40,7 +40,7 @@ async function init(): Promise<void> {
 
   // Initialize animation engine
   const engine = new AnimationEngine(canvas);
-  const spriteUrl = new URL("../../assets/map.png", import.meta.url).href;
+  const spriteUrl = new URL("../../../assets/map.png", import.meta.url).href;
   console.log("Loading sprite from:", spriteUrl);
   await engine.load(spriteUrl, animationData);
   console.log("Sprite loaded, animations:", engine.getAnimationNames().length);

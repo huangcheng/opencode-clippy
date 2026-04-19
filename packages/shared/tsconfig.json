@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "dist/widget/preload",
-    "rootDir": "widget/preload",
+    "outDir": "dist",
+    "rootDir": "src",
     "declaration": true,
+    "resolveJsonModule": true,
     "lib": ["ES2022"]
   },
-  "include": ["widget/preload/**/*.ts"]
+  "include": ["src/**/*.ts"]
 }

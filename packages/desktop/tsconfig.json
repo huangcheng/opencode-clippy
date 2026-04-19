@@ -6,13 +6,9 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "dist",
-    "rootDir": ".",
     "declaration": true,
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": false,
     "lib": ["ES2022"]
   },
-  "include": ["plugin/**/*.ts", "widget/**/*.ts", ".opencode/plugins/**/*.ts"],
-  "exclude": ["node_modules", "dist", "widget/renderer/**/*.ts"]
+  "exclude": ["node_modules", "dist", "src/widget/renderer"]
 }

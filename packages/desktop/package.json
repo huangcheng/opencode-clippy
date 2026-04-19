@@ -1,0 +1,90 @@
+{
+  "name": "@opencode-clippy/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron desktop widget for OpenCode Clippy",
+  "main": "dist/widget/main/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/huangcheng/opencode-clippy.git"
+  },
+  "author": {
+    "name": "HUANG Cheng",
+    "email": "cheng@duck.com"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build:main": "tsc -p tsconfig.main.json && tsc -p tsconfig.preload.json",
+    "build:renderer": "vite build",
+    "build": "pnpm run build:main && pnpm run build:renderer",
+    "dev": "concurrently \"tsc -p tsconfig.main.json --watch\" \"vite build --watch\"",
+    "start": "electron dist/widget/main/main.js",
+    "package": "electron-builder",
+    "package:mac": "electron-builder --mac --arm64",
+    "package:win": "electron-builder --win --x64",
+    "package:linux": "electron-builder --linux --arm64"
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.30.0",
+    "@types/ws": "^8.18.1",
+    "concurrently": "^9.0.0",
+    "electron": "^39.8.5",
+    "electron-builder": "^26.8.1",
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0",
+    "@opencode-clippy/shared": "workspace:*"
+  },
+  "dependencies": {
+    "lottie-web": "^5.12.0",
+    "ws": "^8.18.0"
+  },
+  "build": {
+    "appId": "com.opencode.clippy",
+    "productName": "OpenCode Clippy",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "publish": null,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/**/*"
+    ],
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["arm64"]
+        }
+      ],
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["arm64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["arm64"]
+        }
+      ],
+      "category": "Development"
+    },
+    "extraResources": [
+      {
+        "from": "assets",
+        "to": "assets"
+      }
+    ]
+  }
+}

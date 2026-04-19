@@ -1,0 +1,14 @@
+{
+  "name": "@opencode-clippy/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared logic for OpenCode Clippy (tips engine, types)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

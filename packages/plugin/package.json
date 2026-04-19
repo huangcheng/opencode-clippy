@@ -1,0 +1,32 @@
+{
+  "name": "opencode-clippy",
+  "version": "0.1.0",
+  "description": "OpenCode plugin — Clippy event gateway with proactive tips",
+  "main": "dist/clippy.js",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "opencode",
+    "clippy",
+    "plugin",
+    "ai-assistant"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/huangcheng/opencode-clippy.git"
+  },
+  "author": {
+    "name": "HUANG Cheng",
+    "email": "cheng@duck.com"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc && esbuild dist/clippy.js --bundle --platform=node --format=esm --outfile=dist/bundled.js --external:net --external:os --external:path --external:@opencode-ai/plugin && mv dist/bundled.js dist/clippy.js"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": "^1.4.0",
+    "@opencode-clippy/shared": "workspace:*",
+    "typescript": "^5.6.0"
+  }
+}

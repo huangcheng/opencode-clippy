@@ -1,16 +1,8 @@
 {
-  "name": "opencode-clippy",
+  "name": "opencode-clippy-workspace",
+  "private": true,
   "version": "0.1.0",
   "description": "A Microsoft Office Clippy desktop widget that hooks into OpenCode events — animations, proactive tips, and Lottie effects",
-  "main": "dist/widget/main/main.js",
-  "keywords": [
-    "opencode",
-    "clippy",
-    "plugin",
-    "desktop-widget",
-    "electron",
-    "ai-assistant"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/huangcheng/opencode-clippy.git"
@@ -20,82 +12,19 @@
     "email": "cheng@duck.com"
   },
   "license": "MIT",
-  "files": [
-    ".opencode/plugins/clippy.ts"
-  ],
+  "packageManager": "pnpm@10.12.1",
   "scripts": {
-    "build": "tsc -p tsconfig.main.json && tsc -p tsconfig.preload.json && vite build",
-    "build:main": "tsc -p tsconfig.main.json && tsc -p tsconfig.preload.json",
-    "build:renderer": "vite build",
-    "dev": "concurrently \"tsc -p tsconfig.main.json --watch\" \"vite build --watch\"",
-    "start": "electron dist/widget/main/main.js",
-    "clippy": "npm run build && electron dist/widget/main/main.js",
-    "package": "electron-builder",
-    "package:mac": "electron-builder --mac --arm64",
-    "package:win": "electron-builder --win --x64",
-    "package:linux": "electron-builder --linux --arm64"
+    "build": "pnpm --filter @opencode-clippy/shared build && pnpm --filter opencode-clippy build && pnpm --filter @opencode-clippy/desktop build",
+    "build:plugin": "pnpm --filter opencode-clippy build",
+    "build:desktop": "pnpm --filter @opencode-clippy/desktop build",
+    "dev": "pnpm --filter @opencode-clippy/desktop dev",
+    "package": "pnpm --filter @opencode-clippy/desktop package",
+    "package:mac": "pnpm --filter @opencode-clippy/desktop package:mac",
+    "package:win": "pnpm --filter @opencode-clippy/desktop package:win",
+    "package:linux": "pnpm --filter @opencode-clippy/desktop package:linux",
+    "start": "pnpm --filter @opencode-clippy/desktop start"
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "^0.30.0",
-    "@opencode-ai/plugin": "^1.4.0",
-    "@types/ws": "^8.18.1",
-    "concurrently": "^9.0.0",
-    "electron": "^39.8.5",
-    "electron-builder": "^26.8.1",
-    "typescript": "^5.6.0",
-    "vite": "^6.0.0"
-  },
-  "dependencies": {
-    "lottie-web": "^5.12.0",
-    "ws": "^8.18.0"
-  },
-  "build": {
-    "appId": "com.opencode.clippy",
-    "productName": "OpenCode Clippy",
-    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-    "publish": null,
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "dist/**/*",
-      "assets/**/*"
-    ],
-    "mac": {
-      "target": [
-        {
-          "target": "dmg",
-          "arch": ["arm64"]
-        }
-      ],
-      "category": "public.app-category.developer-tools"
-    },
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": ["x64"]
-        }
-      ]
-    },
-    "linux": {
-      "target": [
-        {
-          "target": "AppImage",
-          "arch": ["arm64"]
-        },
-        {
-          "target": "deb",
-          "arch": ["arm64"]
-        }
-      ],
-      "category": "Development"
-    },
-    "extraResources": [
-      {
-        "from": "assets",
-        "to": "assets"
-      }
-    ]
+    "typescript": "^5.6.0"
   }
 }

@@ -69,14 +69,14 @@ Or build from source:
 ```bash
 git clone https://github.com/huangcheng/opencode-clippy.git
 cd opencode-clippy
-npm install
-npm run build
-npm start
+pnpm install
+pnpm build
+pnpm start
 ```
 
 ### Usage
 
-1. Start the Clippy desktop widget (from the downloaded app or `npm start`)
+1. Start the Clippy desktop widget (from the downloaded app or `pnpm start`)
 2. Start OpenCode in any project directory
 3. Clippy reacts to your coding — they auto-connect in any launch order
 
@@ -84,20 +84,20 @@ npm start
 
 ```bash
 # Watch mode (rebuild on changes)
-npm run dev
+pnpm dev
 
 # Run the widget standalone
-npm start
+pnpm start
 
 # Run the test harness (visual animation tester)
-npx vite dev
+pnpm --filter @opencode-clippy/desktop exec vite dev
 # then open http://localhost:5173/test-harness.html
 
 # Package for distribution
-npm run package        # current platform
-npm run package:mac    # macOS .dmg
-npm run package:win    # Windows .exe
-npm run package:linux  # Linux .AppImage/.deb
+pnpm package          # current platform
+pnpm package:mac      # macOS .dmg
+pnpm package:win      # Windows .exe
+pnpm package:linux    # Linux .AppImage/.deb
 ```
 
 ## Event Mappings
@@ -137,26 +137,25 @@ Tips have a 5-minute cooldown per pattern to avoid nagging.
 
 ```
 opencode-clippy/
-├── .opencode/plugins/
-│   └── clippy.ts              # OpenCode plugin — event gateway + tips engine
-├── widget/
-│   ├── main/main.ts           # Electron main — window, tray, IPC server
-│   ├── preload/preload.ts     # Context bridge for IPC → renderer
-│   └── renderer/
-│       ├── index.html          # Widget layout (transparent, frameless)
-│       ├── renderer.ts         # Main renderer — wires everything together
-│       ├── animation-engine.ts # Canvas sprite renderer with priority queue
-│       ├── event-mapping.ts    # OpenCode event → animation/tip mapping
-│       ├── speech-bubble.ts    # Windows 98 tooltip (classic yellow)
-│       └── lottie-effects.ts   # Lottie overlay (sparkles, confetti, etc.)
-├── plugin/
-│   └── tips-engine.ts         # Proactive tips pattern matching
-├── assets/
-│   ├── map.png                # Clippy sprite sheet (124×93px frames)
-│   ├── animations.json        # Frame timing data (43 animations)
-│   ├── icon.png               # Tray icon
-│   └── lottie/                # Lottie effect JSONs
-└── package.json
+├── packages/
+│   ├── plugin/
+│   │   └── src/clippy.ts         # OpenCode plugin — event gateway
+│   ├── desktop/
+│   │   ├── src/widget/
+│   │   │   ├── main/main.ts      # Electron main — window, tray, IPC server
+│   │   │   ├── preload/preload.ts# Context bridge for IPC → renderer
+│   │   │   └── renderer/
+│   │   │       ├── index.html     # Widget layout (transparent, frameless)
+│   │   │       ├── renderer.ts    # Main renderer — wires everything together
+│   │   │       ├── animation-engine.ts # Canvas sprite renderer with priority queue
+│   │   │       ├── event-mapping.ts    # OpenCode event → animation/tip mapping
+│   │   │       ├── speech-bubble.ts    # Windows 98 tooltip (classic yellow)
+│   │   │       └── lottie-effects.ts   # Lottie overlay (sparkles, confetti, etc.)
+│   │   ├── assets/               # Sprite sheet, lottie effects, tray icon
+│   │   └── vite.config.ts
+│   └── shared/
+│       └── src/tips-engine.ts    # Proactive tips pattern matching
+└── pnpm-workspace.yaml
 ```
 
 ### IPC Protocol

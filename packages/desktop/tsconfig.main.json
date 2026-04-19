@@ -7,10 +7,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "outDir": "dist/widget/main",
-    "rootDir": "widget/main",
+    "rootDir": "src/widget/main",
     "declaration": true,
     "resolveJsonModule": true,
     "lib": ["ES2022"]
   },
-  "include": ["widget/main/**/*.ts"]
+  "include": ["src/widget/main/**/*.ts"]
 }
