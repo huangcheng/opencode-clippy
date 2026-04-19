@@ -78,15 +78,25 @@ function createTray(): void {
   tray.setToolTip("OpenCode Clippy");
   tray.setContextMenu(Menu.buildFromTemplate([
     {
-      label: "Show/Hide Clippy",
+      label: "Settings",
       click: () => {
         if (mainWindow) mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
       },
     },
+    {
+      label: "About",
+      click: () => {
+        const { dialog } = require("electron");
+        dialog.showMessageBox({
+          type: "info",
+          title: "About OpenCode Clippy",
+          message: "OpenCode Clippy",
+          detail: `Version ${app.getVersion()}\nA Clippy-style assistant for OpenCode\n\nhttps://github.com/huangcheng/opencode-clippy`,
+        });
+      },
+    },
     { type: "separator" },
-    { label: `IPC: ${IPC_PATH}`, enabled: false },
-    { type: "separator" },
-    { label: "Quit", click: () => app.quit() },
+    { label: "Exit", click: () => app.quit() },
   ]));
 }
 
