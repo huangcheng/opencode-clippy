@@ -2,7 +2,7 @@
   "name": "opencode-clippy",
   "version": "0.1.0",
   "description": "A Microsoft Office Clippy desktop widget that hooks into OpenCode events — animations, proactive tips, and Lottie effects",
-  "main": ".opencode/plugins/clippy.ts",
+  "main": "dist/widget/main/main.js",
   "keywords": [
     "opencode",
     "clippy",
@@ -54,7 +54,6 @@
     "directories": {
       "output": "release"
     },
-    "main": "dist/widget/main/main.js",
     "files": [
       "dist/**/*",
       "assets/**/*"
