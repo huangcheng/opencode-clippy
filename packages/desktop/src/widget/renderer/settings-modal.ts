@@ -21,7 +21,7 @@ export class SettingsModal {
       left: "0",
       width: "100%",
       height: "100%",
-      backgroundColor: "rgba(0,0,0,0.3)",
+      backgroundColor: "transparent",
       zIndex: "200",
       display: "flex",
       alignItems: "center",
