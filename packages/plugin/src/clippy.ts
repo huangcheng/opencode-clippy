@@ -1,16 +1,12 @@
 import type { Plugin } from "@opencode-ai/plugin";
-import { TipsEngine } from "@opencode-clippy/shared";
+import { TipsEngine, getIPCPath } from "@opencode-clippy/shared";
 import * as net from "net";
-import * as os from "os";
-import * as path from "path";
 
 // ============================================================
 // Plugin — uses Unix socket / named pipe (no WebSocket, no ws dependency)
 // ============================================================
 
-const IPC_PATH = process.platform === "win32"
-  ? "\\\\.\\pipe\\opencode-clippy"
-  : path.join(os.tmpdir(), "opencode-clippy.sock");
+const IPC_PATH = getIPCPath();
 
 const RECONNECT_MS = 1000;
 const HEARTBEAT_MS = 5000;

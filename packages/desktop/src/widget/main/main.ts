@@ -2,16 +2,14 @@ import { app, BrowserWindow, screen, Tray, Menu, nativeImage } from "electron";
 import * as net from "net";
 import * as path from "path";
 import * as fs from "fs";
-import * as os from "os";
+import { getIPCPath } from "@opencode-clippy/shared";
 
 const WINDOW_WIDTH = 350;
 const WINDOW_HEIGHT = 300;
 const EDGE_OFFSET = 50;
 
 // IPC path — Unix socket on macOS/Linux, named pipe on Windows
-const IPC_PATH = process.platform === "win32"
-  ? "\\\\.\\pipe\\opencode-clippy"
-  : path.join(os.tmpdir(), "opencode-clippy.sock");
+const IPC_PATH = getIPCPath();
 
 // Single instance lock
 const gotLock = app.requestSingleInstanceLock();
@@ -95,8 +93,10 @@ function createWindow(): void {
 }
 
 function startIPCServer(): void {
-  // Clean up stale socket file on macOS/Linux
+  // Ensure the socket directory exists on macOS/Linux
   if (process.platform !== "win32") {
+    const dir = path.dirname(IPC_PATH);
+    fs.mkdirSync(dir, { recursive: true });
     try { fs.unlinkSync(IPC_PATH); } catch { /* doesn't exist */ }
   }
 
