@@ -82,7 +82,18 @@ export class AnimationEngine {
   }
 
   play(name: string, priority: Priority = "normal"): Promise<void> {
-    console.log(`AnimationEngine.play("${name}", "${priority}") playing=${this.playing} queue=${this.queue.length}`);
+    console.log(`AnimationEngine.play("${name}", "${priority}") playing=${this.playing} current=${this.currentAnimation} queue=${this.queue.length}`);
+
+    // Deduplicate: if this animation is already playing, don't restart it
+    if (this.currentAnimation === name && this.playing) {
+      return Promise.resolve();
+    }
+
+    // Deduplicate: if this animation is already the last item in the queue, skip it
+    if (this.queue.length > 0 && this.queue[this.queue.length - 1].name === name) {
+      return Promise.resolve();
+    }
+
     return new Promise<void>((resolve) => {
       if (priority === "high" && this.playing) {
         this.stopCurrentAnimation();
