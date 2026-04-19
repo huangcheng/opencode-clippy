@@ -54,6 +54,7 @@
     "directories": {
       "output": "release"
     },
+    "main": "dist/widget/main/main.js",
     "files": [
       "dist/**/*",
       "assets/**/*"
