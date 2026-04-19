@@ -91,7 +91,7 @@ function createTray(): void {
           type: "info",
           title: "About OpenCode Clippy",
           message: "OpenCode Clippy",
-          detail: `Version ${app.getVersion()}\nA Clippy-style assistant for OpenCode\n\nhttps://github.com/huangcheng/opencode-clippy`,
+          detail: `Version ${app.getVersion()}\nA Clippy-style assistant for OpenCode\n\n© HUANG Cheng\nhttps://github.com/huangcheng/opencode-clippy`,
         });
       },
     },
