@@ -29,6 +29,7 @@ const CONFIG_PATH = path.join(CONFIG_DIR, "config.json");
 
 interface ClippyConfig {
   window?: { x: number; y: number };
+  autoStart?: boolean;
 }
 
 function loadConfig(): ClippyConfig {
@@ -76,13 +77,27 @@ function createTray(): void {
 
   tray = new Tray(trayIcon);
   tray.setToolTip("OpenCode Clippy");
+  rebuildTrayMenu();
+}
+
+function rebuildTrayMenu(): void {
+  if (!tray) return;
+  const config = loadConfig();
+  const autoStartEnabled = config.autoStart ?? false;
+
   tray.setContextMenu(Menu.buildFromTemplate([
     {
-      label: "Settings",
-      click: () => {
-        if (mainWindow) mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
+      label: "Launch at Login",
+      type: "checkbox",
+      checked: autoStartEnabled,
+      click: (menuItem) => {
+        const enabled = menuItem.checked;
+        app.setLoginItemSettings({ openAtLogin: enabled });
+        saveConfig({ ...loadConfig(), autoStart: enabled });
+        rebuildTrayMenu();
       },
     },
+    { type: "separator" },
     {
       label: "About",
       click: () => {
@@ -233,6 +248,10 @@ app.whenReady().then(() => {
   if (app.dock) {
     app.dock.hide();
   }
+  // Sync login item with saved config
+  const config = loadConfig();
+  app.setLoginItemSettings({ openAtLogin: config.autoStart ?? false });
+
   createWindow();
   createTray();
   startIPCServer();
