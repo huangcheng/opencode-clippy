@@ -14,7 +14,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build:main": "tsc -p tsconfig.main.json && tsc -p tsconfig.preload.json",
+    "build:main": "tsc -p tsconfig.main.json && esbuild dist/widget/main/main.js --bundle --platform=node --format=cjs --outfile=dist/widget/main/main.bundled.js --external:electron && mv dist/widget/main/main.bundled.js dist/widget/main/main.js && tsc -p tsconfig.preload.json",
     "build:renderer": "vite build",
     "build": "pnpm run build:main && pnpm run build:renderer",
     "dev": "concurrently \"tsc -p tsconfig.main.json --watch\" \"vite build --watch\"",
