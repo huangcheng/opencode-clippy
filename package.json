@@ -15,7 +15,10 @@
     "type": "git",
     "url": "https://github.com/huangcheng/opencode-clippy.git"
   },
-  "author": "huangcheng",
+  "author": {
+    "name": "HUANG Cheng",
+    "email": "cheng@duck.com"
+  },
   "license": "MIT",
   "files": [
     ".opencode/plugins/clippy.ts"
