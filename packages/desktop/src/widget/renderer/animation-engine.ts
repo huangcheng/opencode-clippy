@@ -20,28 +20,67 @@ const FRAME_WIDTH = 124;
 const FRAME_HEIGHT = 93;
 const IDLE_PAUSE_MS = 3000;
 
-const IDLE_ANIMATIONS = [
-  "IdleAtom",
-  "IdleEyeBrowRaise",
-  "IdleFingerTap",
-  "IdleHeadScratch",
-  "IdleRopePile",
-  "IdleSideToSide",
-  "IdleSnooze",
-  "Idle1_1",
-  "LookRight",
-  "LookLeft",
-  "LookUp",
-  "LookDown",
-  "LookUpRight",
-  "LookUpLeft",
-  "LookDownRight",
-  "LookDownLeft",
-  "Wave",
-  "GetArtsy",
-  "Hearing_1",
-  "CheckingSomething",
+// Weighted idle animation tiers — common plays ~3x more than rare
+interface WeightedAnimation { name: string; weight: number; }
+
+const IDLE_POOL: WeightedAnimation[] = [
+  // Common (weight 3) — subtle idles and look-arounds
+  { name: "IdleAtom", weight: 3 },
+  { name: "IdleEyeBrowRaise", weight: 3 },
+  { name: "IdleFingerTap", weight: 3 },
+  { name: "IdleHeadScratch", weight: 3 },
+  { name: "IdleRopePile", weight: 3 },
+  { name: "IdleSideToSide", weight: 3 },
+  { name: "IdleSnooze", weight: 3 },
+  { name: "Idle1_1", weight: 3 },
+  { name: "LookRight", weight: 3 },
+  { name: "LookLeft", weight: 3 },
+  { name: "LookUp", weight: 3 },
+  { name: "LookDown", weight: 3 },
+  { name: "LookUpRight", weight: 3 },
+  { name: "LookUpLeft", weight: 3 },
+  { name: "LookDownRight", weight: 3 },
+  { name: "LookDownLeft", weight: 3 },
+  { name: "Hearing_1", weight: 3 },
+  { name: "CheckingSomething", weight: 3 },
+  // Medium (weight 2) — expressive
+  { name: "Wave", weight: 2 },
+  { name: "Greeting", weight: 2 },
+  { name: "GetArtsy", weight: 2 },
+  { name: "GetTechy", weight: 2 },
+  { name: "Thinking", weight: 2 },
+  // Rare (weight 1) — dramatic
+  { name: "GetWizardy", weight: 1 },
+  { name: "GetAttention", weight: 1 },
+  { name: "Alert", weight: 1 },
+  { name: "Processing", weight: 1 },
+  { name: "Congratulate", weight: 1 },
+  { name: "GoodBye", weight: 1 },
+  { name: "Save", weight: 1 },
+  { name: "Searching", weight: 1 },
+  { name: "Writing", weight: 1 },
+  { name: "Explain", weight: 1 },
+  { name: "Print", weight: 1 },
+  { name: "SendMail", weight: 1 },
+  { name: "Show", weight: 1 },
+  { name: "Hide", weight: 1 },
+  { name: "EmptyTrash", weight: 1 },
+  { name: "GestureUp", weight: 1 },
+  { name: "GestureDown", weight: 1 },
+  { name: "GestureLeft", weight: 1 },
+  { name: "GestureRight", weight: 1 },
 ];
+
+function pickWeightedRandom(pool: WeightedAnimation[], exclude?: string): string {
+  const filtered = exclude ? pool.filter((a) => a.name !== exclude) : pool;
+  const totalWeight = filtered.reduce((sum, a) => sum + a.weight, 0);
+  let roll = Math.random() * totalWeight;
+  for (const anim of filtered) {
+    roll -= anim.weight;
+    if (roll <= 0) return anim.name;
+  }
+  return filtered[filtered.length - 1].name;
+}
 
 export class AnimationEngine {
   private canvas: HTMLCanvasElement;
@@ -55,6 +94,7 @@ export class AnimationEngine {
   private idleTimer: number | null = null;
   private playing = false;
   private destroyed = false;
+  private lastIdleAnimation: string | null = null;
 
   onAnimationStart?: (name: string) => void;
   onAnimationEnd?: (name: string) => void;
@@ -209,9 +249,9 @@ export class AnimationEngine {
 
     this.idleTimer = window.setTimeout(() => {
       if (this.destroyed || this.playing || this.queue.length > 0) return;
-      const randomIdle =
-        IDLE_ANIMATIONS[Math.floor(Math.random() * IDLE_ANIMATIONS.length)];
-      this.play(randomIdle, "normal");
+      const picked = pickWeightedRandom(IDLE_POOL, this.lastIdleAnimation ?? undefined);
+      this.lastIdleAnimation = picked;
+      this.play(picked, "normal");
     }, IDLE_PAUSE_MS);
   }
 

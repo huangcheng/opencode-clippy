@@ -6,4 +6,7 @@ contextBridge.exposeInMainWorld("clippy", {
       callback(data);
     });
   },
+  startDrag: () => ipcRenderer.send("drag-start"),
+  moveDrag: (x: number, y: number) => ipcRenderer.send("drag-move", x, y),
+  stopDrag: () => ipcRenderer.send("drag-stop"),
 });

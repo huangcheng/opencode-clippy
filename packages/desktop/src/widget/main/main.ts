@@ -1,7 +1,8 @@
-import { app, BrowserWindow, screen, Tray, Menu, nativeImage } from "electron";
+import { app, BrowserWindow, screen, Tray, Menu, nativeImage, ipcMain } from "electron";
 import * as net from "net";
 import * as path from "path";
 import * as fs from "fs";
+import * as os from "os";
 import { getIPCPath } from "@opencode-clippy/shared";
 
 const WINDOW_WIDTH = 350;
@@ -21,6 +22,37 @@ if (!gotLock) {
 let mainWindow: BrowserWindow | null = null;
 let ipcServer: net.Server | null = null;
 let tray: Tray | null = null;
+
+// --- Config persistence ---
+const CONFIG_DIR = path.join(os.homedir(), ".opencode-clippy");
+const CONFIG_PATH = path.join(CONFIG_DIR, "config.json");
+
+interface ClippyConfig {
+  window?: { x: number; y: number };
+}
+
+function loadConfig(): ClippyConfig {
+  try {
+    const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+
+function saveConfig(config: ClippyConfig): void {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try {
+      fs.mkdirSync(CONFIG_DIR, { recursive: true });
+      fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
+    } catch (e) {
+      console.warn("Failed to save config:", e);
+    }
+  }, 500);
+}
 
 function getIconPath(): string {
   const candidates = [
@@ -60,12 +92,15 @@ function createTray(): void {
 
 function createWindow(): void {
   const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
+  const config = loadConfig();
+  const startX = config.window?.x ?? (screenWidth - WINDOW_WIDTH - EDGE_OFFSET);
+  const startY = config.window?.y ?? (screenHeight - WINDOW_HEIGHT - EDGE_OFFSET);
 
   mainWindow = new BrowserWindow({
     width: WINDOW_WIDTH,
     height: WINDOW_HEIGHT,
-    x: screenWidth - WINDOW_WIDTH - EDGE_OFFSET,
-    y: screenHeight - WINDOW_HEIGHT - EDGE_OFFSET,
+    x: startX,
+    y: startY,
     transparent: true,
     frame: false,
     alwaysOnTop: true,
@@ -159,6 +194,28 @@ function startIPCServer(): void {
 
 app.on("second-instance", () => {
   if (mainWindow && !mainWindow.isVisible()) mainWindow.show();
+});
+
+// --- Drag IPC handlers ---
+let dragOffset: { x: number; y: number } | null = null;
+
+ipcMain.on("drag-start", () => {
+  if (!mainWindow) return;
+  const [wx, wy] = mainWindow.getPosition();
+  const cursor = screen.getCursorScreenPoint();
+  dragOffset = { x: cursor.x - wx, y: cursor.y - wy };
+});
+
+ipcMain.on("drag-move", (_e, cursorX: number, cursorY: number) => {
+  if (!mainWindow || !dragOffset) return;
+  mainWindow.setPosition(cursorX - dragOffset.x, cursorY - dragOffset.y);
+});
+
+ipcMain.on("drag-stop", () => {
+  if (!mainWindow) return;
+  dragOffset = null;
+  const [x, y] = mainWindow.getPosition();
+  saveConfig({ ...loadConfig(), window: { x, y } });
 });
 
 app.whenReady().then(() => {
