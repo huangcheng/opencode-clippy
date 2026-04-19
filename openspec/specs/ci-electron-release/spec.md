@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Electron builds trigger on version tags
 The GitHub Actions workflow SHALL trigger on push of tags matching `v*.*.*`.
@@ -30,3 +30,24 @@ The workflow SHALL auto-generate release notes from commit history since the pre
 #### Scenario: Release has notes
 - **WHEN** the release is created
 - **THEN** it contains auto-generated notes listing commits since the last release
+
+### Requirement: CI uses pnpm for Electron builds
+The build-electron job SHALL use `pnpm/action-setup@v4` to install pnpm, `pnpm install --frozen-lockfile` for dependencies, and `pnpm --filter @opencode-clippy/desktop` for targeted build and package commands.
+
+#### Scenario: pnpm-based Electron build flow
+- **WHEN** the build-electron job runs
+- **THEN** it uses `pnpm install --frozen-lockfile` and `pnpm --filter @opencode-clippy/desktop build` to build the desktop app
+
+### Requirement: Version set on desktop package
+The workflow SHALL set the version from the git tag on `packages/desktop/package.json` before packaging.
+
+#### Scenario: Electron binary version matches tag
+- **WHEN** tag `v1.2.3` triggers the workflow
+- **THEN** `packages/desktop/package.json` version is set to `1.2.3` so the built binary reports the correct version
+
+### Requirement: electron-builder runs from desktop package context
+The workflow SHALL run `electron-builder` from within the `packages/desktop` directory or use `pnpm --filter @opencode-clippy/desktop package` so that electron-builder reads the correct `package.json` build section.
+
+#### Scenario: electron-builder finds correct config
+- **WHEN** electron-builder runs
+- **THEN** it reads the `build` section from `packages/desktop/package.json` (not root)
