@@ -229,6 +229,10 @@ ipcMain.on("drag-stop", () => {
 });
 
 app.whenReady().then(() => {
+  // Hide dock icon (macOS), taskbar icon (Windows/Linux handled by skipTaskbar on the window)
+  if (app.dock) {
+    app.dock.hide();
+  }
   createWindow();
   createTray();
   startIPCServer();
