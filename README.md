@@ -178,7 +178,7 @@ Plugin → Widget communication uses newline-delimited JSON over Unix socket (`/
 {"type": "ping"}
 ```
 
-## Special Thanks
+## Acknowledgements
 
 - **[felixrieseberg/clippy](https://github.com/felixrieseberg/clippy)** — Clippy sprite sheet assets (`map.png`, `animations.json`) and animation frame data. This project's sprite rendering is built directly on top of these lovingly extracted assets.
 - **[panta82/opencode-notificator](https://github.com/panta82/opencode-notificator)** — Reference implementation for OpenCode plugin event handling. The `session.idle` detection pattern and session ID tracking approach were adapted from this project.
