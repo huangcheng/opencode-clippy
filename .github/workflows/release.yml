@@ -74,7 +74,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm --filter @opencode-clippy/desktop build
+        run: pnpm --filter @opencode-clippy/shared build && pnpm --filter @opencode-clippy/desktop build
 
       - name: Setup QEMU (Linux arm64 cross-compilation)
         if: matrix.os == 'ubuntu-latest'
