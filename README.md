@@ -32,7 +32,7 @@ They communicate over a local socket — no network, no ports, no firewall issue
 
 ```
                     Unix Socket / Named Pipe
-                    /tmp/opencode-clippy.sock
+                    ~/.opencode-clippy/clippy.sock
                               
 OpenCode ──► Plugin (clippy.ts) ──────────────► Electron Widget
              events + tips engine               sprite canvas + speech bubble + lottie
@@ -160,7 +160,7 @@ opencode-clippy/
 
 ### IPC Protocol
 
-Plugin → Widget communication uses newline-delimited JSON over Unix socket (`/tmp/opencode-clippy.sock`) or named pipe (`\\.\pipe\opencode-clippy` on Windows).
+Plugin → Widget communication uses newline-delimited JSON over Unix socket (`~/.opencode-clippy/clippy.sock`) or named pipe (`\\.\pipe\opencode-clippy` on Windows).
 
 **Event message:**
 ```json
